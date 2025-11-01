@@ -3,7 +3,7 @@
 A simple collection of COBOL programs I created during my 2nd year, 1st semester.  
 These programs were written as part of my coursework and exercises to learn the fundamentals of COBOL programming.
 
-![Nagalaptop](my-cobol-practices/baklang naglalaptop.jpg)
+![COBOL Banner](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9V2AFErjRhYGN0gCWmOUKowHmw5lCrEsusQ&s)
 
 ---
 
