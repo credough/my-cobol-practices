@@ -5,8 +5,6 @@ These programs were written as part of my coursework and exercises to learn the 
 
 ![COBOL Banner](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9V2AFErjRhYGN0gCWmOUKowHmw5lCrEsusQ&s)
 
----
-
 ## Overview
 
 This repository includes various COBOL programs covering basic to intermediate concepts such as:
@@ -16,7 +14,6 @@ This repository includes various COBOL programs covering basic to intermediate c
 
 Each program demonstrates key COBOL features and is organized for easy reference and study.
 
----
 
 ## Purpose
 
