@@ -1,0 +1,31 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. AgeChecker.
+       DATE-WRITTEN. 11-13-2025.
+       DATE-COMPILED. 11-13-2025.
+
+       ENVIRONMENT DIVISION.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 AGE PIC 99 VALUE ZERO.
+       01 HEAD.
+           02 FILLER PIC X(10).
+           02 PIC X(11) VALUE 'AGE CHECKER'.
+           02 FILLER PIC X(10).
+       PROCEDURE DIVISION.
+       MAIN-PROGRAM.
+           DISPLAY HEAD
+           DISPLAY "ENTER YOUR AGE: "
+           ACCEPT AGE
+
+           IF AGE < 18
+               DISPLAY "YOU ARE A MINOR AND CANNOT VOTE"
+           ELSE IF AGE > 18
+               DISPLAY "YOU ARE AN ADULT AND CAN VOTE"
+           ELSE
+               DISPLAY "YOU ARE SENIOR CITIZEN AND CAN VOTE"
+           END-IF
+
+           DISPLAY "THANK YOU!!"
+
+           STOP RUN.
