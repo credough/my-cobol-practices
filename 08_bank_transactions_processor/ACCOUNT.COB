@@ -1,0 +1,171 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. ACCOUNT.
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-PC.
+       OBJECT-COMPUTER. IBM-PC.
+
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT INFILE ASSIGN TO "TRANSACT.TXT".
+           SELECT OUTFILE ASSIGN TO "REPORT.TXT".
+
+       DATA DIVISION.
+       FILE SECTION.
+
+       FD INFILE
+           LABEL RECORD IS STANDARD
+           RECORD CONTAINS 43 CHARACTERS
+           DATA RECORD IS INREC.
+
+       01 INREC.
+           02 ACCT-NO     PIC X(10).
+           02 ACCT-NAME   PIC X(25).
+           02 TRN-CODE    PIC X.
+           02 TRN-AMT     PIC 9(7)V99.
+
+       FD OUTFILE
+           LABEL RECORD IS OMITTED
+           DATA RECORD IS OUTREC.
+
+       01 OUTREC.
+           02 FILLER PIC X(80).
+
+       WORKING-STORAGE SECTION.
+
+       01 WS-EOF      PIC 9 VALUE 0.
+       01 WS-SAVE-ACC PIC X(10) VALUE SPACES.
+       01 WS-BAL      PIC S9(9)V99 VALUE 0.
+       01 WS-RECS     PIC 9(5) VALUE 0.
+       01 WS-TBAL     PIC S9(11)V99 VALUE 0.
+
+       01 HD1.
+           02 FILLER PIC X(32) VALUE SPACES.
+           02 FILLER PIC X(16) VALUE "CHINA TRUST BANK".
+           02 FILLER PIC X(32) VALUE SPACES.
+
+       01 HD2.
+           02 FILLER PIC X(34) VALUE SPACES.
+           02 FILLER PIC X(13) VALUE "MAKATI AVENUE".
+           02 FILLER PIC X(33) VALUE SPACES.
+
+       01 HD3.
+           02 FILLER PIC X(35) VALUE SPACES.
+           02 FILLER PIC X(11) VALUE "MAKATI CITY".
+           02 FILLER PIC X(34) VALUE SPACES.
+
+       01 HD4.
+           02 FILLER PIC X(33) VALUE SPACES.
+           02 FILLER PIC X(14) VALUE "ACCOUNT REPORT".
+           02 FILLER PIC X(33) VALUE SPACES.
+
+       01 HD5.
+           02 FILLER PIC X(19) VALUE SPACES.
+           02 FILLER PIC X(10) VALUE "ACCOUNT NO".
+           02 FILLER PIC X(5)  VALUE SPACES.
+           02 FILLER PIC X(12) VALUE "ACCOUNT NAME".
+           02 FILLER PIC X(8)  VALUE SPACES.
+           02 FILLER PIC X(7)  VALUE "BALANCE".
+           02 FILLER PIC X(19) VALUE SPACES.
+
+
+       01 DETAIL-LINE.
+           02 FILLER     PIC X(2) VALUE SPACES.
+           02 D-ACCNO    PIC X(10).
+           02 FILLER     PIC X(3) VALUE SPACES.
+           02 D-ACCNAME  PIC X(25).
+           02 FILLER     PIC X(3) VALUE SPACES.
+           02 D-BAL      PIC ZZZ,ZZZ,ZZ9.99.
+           02 FILLER     PIC X(25) VALUE SPACES.
+
+
+       01 TOT1.
+           02 FILLER PIC X(5) VALUE SPACES.
+           02 FILLER PIC X(26) VALUE "TOTAL NO. OF RECORDS PRINTED:".
+           02 FILLER PIC X(3) VALUE SPACES.
+           02 T-RECS PIC 9(5).
+           02 FILLER PIC X(31) VALUE SPACES.
+
+       01 TOT2.
+           02 FILLER PIC X(5) VALUE SPACES.
+           02 FILLER PIC X(24) VALUE "TOTAL ACCUMULATED BALANCE:".
+           02 FILLER PIC X(4) VALUE " P ".
+           02 T-TBAL PIC Z,ZZZ,ZZZ,ZZ9.99.
+           02 FILLER PIC X(20) VALUE SPACES.
+
+       PROCEDURE DIVISION.
+
+       MAIN-RTN.
+           OPEN INPUT INFILE
+                OUTPUT OUTFILE.
+
+           READ INFILE AT END
+                MOVE 1 TO WS-EOF
+           END-READ.
+
+           IF WS-EOF = 1
+                DISPLAY "EMPTY FILE"
+                CLOSE INFILE OUTFILE
+                STOP RUN
+           END-IF.
+
+           MOVE ACCT-NO TO WS-SAVE-ACC.
+
+           PERFORM WRITE-HEADERS.
+
+           PERFORM UNTIL WS-EOF = 1
+                IF ACCT-NO NOT = WS-SAVE-ACC
+                     PERFORM ACC-BREAK
+                END-IF
+
+                PERFORM PROCESS-REC
+
+                READ INFILE AT END
+                     MOVE 1 TO WS-EOF
+                END-READ
+           END-PERFORM.
+
+           PERFORM ACC-BREAK.
+           PERFORM WRITE-TOTALS.
+
+           CLOSE INFILE OUTFILE.
+           STOP RUN.
+
+       PROCESS-REC.
+           IF TRN-CODE = "D"
+                ADD TRN-AMT TO WS-BAL
+           ELSE
+                SUBTRACT TRN-AMT FROM WS-BAL
+           END-IF.
+           EXIT.
+
+       ACC-BREAK.
+           MOVE WS-SAVE-ACC TO D-ACCNO.
+           MOVE ACCT-NAME   TO D-ACCNAME.
+           MOVE WS-BAL      TO D-BAL.
+
+           WRITE OUTREC FROM DETAIL-LINE AFTER ADVANCING 1.
+
+           ADD 1 TO WS-RECS.
+           ADD WS-BAL TO WS-TBAL.
+
+           MOVE ACCT-NO TO WS-SAVE-ACC.
+           MOVE 0 TO WS-BAL.
+           EXIT.
+
+       WRITE-HEADERS.
+           WRITE OUTREC FROM HD1 AFTER PAGE.
+           WRITE OUTREC FROM HD2 AFTER ADVANCING 1.
+           WRITE OUTREC FROM HD3 AFTER ADVANCING 1.
+           WRITE OUTREC FROM HD4 AFTER ADVANCING 2.
+           WRITE OUTREC FROM HD5 AFTER ADVANCING 1.
+           EXIT.
+
+       WRITE-TOTALS.
+           MOVE WS-RECS TO T-RECS.
+           MOVE WS-TBAL TO T-TBAL.
+
+           WRITE OUTREC FROM TOT1 AFTER ADVANCING 3.
+           WRITE OUTREC FROM TOT2 AFTER ADVANCING 1.
+           EXIT.
